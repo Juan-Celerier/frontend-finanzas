@@ -8,7 +8,7 @@ import React, {
 import { AuthContextType, User, LoginRequest, RegisterRequest } from "../types";
 
 const AUTH_API_BASE = `${
-  import.meta.env.VITE_AUTH_API_URL || "http://localhost:3001"
+  import.meta.env.VITE_AUTH_API || "http://localhost:3001"
 }/auth`;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

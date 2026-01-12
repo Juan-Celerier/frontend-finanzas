@@ -11,7 +11,7 @@ import {
 } from "../types";
 
 const FINANZAS_API_BASE =
-  import.meta.env.VITE_FINANZAS_API_URL || "http://localhost:3002";
+  import.meta.env.VITE_FINANZAS_API || "http://localhost:3002";
 
 class ApiService {
   private getAuthHeaders(token: string) {
