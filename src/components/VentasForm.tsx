@@ -9,11 +9,7 @@ interface VentasFormProps {
   onCancel: () => void;
 }
 
-const VentasForm: React.FC<VentasFormProps> = ({
-  venta,
-  onSuccess,
-  onCancel,
-}) => {
+const VentasForm = ({ venta, onSuccess, onCancel }: VentasFormProps) => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

@@ -9,11 +9,11 @@ interface GastosFormProps {
   onCancel: () => void;
 }
 
-const GastosForm: React.FC<GastosFormProps> = ({
+const GastosForm = ({
   gasto,
   onSuccess,
   onCancel,
-}) => {
+}: GastosFormProps) => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
