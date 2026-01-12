@@ -80,6 +80,8 @@ export interface FilterParams {
   start_date?: string;
   end_date?: string;
   categoria?: string;
+  dashboard?: boolean;
+  limit?: number;
 }
 
 export interface ImportData {

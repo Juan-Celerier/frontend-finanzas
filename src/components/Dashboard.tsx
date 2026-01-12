@@ -20,6 +20,13 @@ const Dashboard: React.FC = () => {
   const [chartData, setChartData] = useState<LineChartPoint[]>([]);
   const [ventas, setVentas] = useState<Venta[]>([]);
   const [gastos, setGastos] = useState<Gasto[]>([]);
+  const [summary, setSummary] = useState<{
+    total_ventas: number;
+    total_gastos: number;
+    balance: number;
+    count_ventas: number;
+    count_gastos: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -34,13 +41,24 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       setError("");
 
-      const [chartResult, ventasResult, gastosResult] = await Promise.all([
-        apiService.getDashboardData(token!),
-        apiService.getVentas(token!, { period: "month" }),
-        apiService.getGastos(token!, { period: "month" }),
-      ]);
+      const [chartResult, summaryResult, ventasResult, gastosResult] =
+        await Promise.all([
+          apiService.getDashboardData(token!),
+          apiService.getDashboardSummary(token!),
+          apiService.getVentas(token!, {
+            period: "month",
+            dashboard: true,
+            limit: 5,
+          }),
+          apiService.getGastos(token!, {
+            period: "month",
+            dashboard: true,
+            limit: 5,
+          }),
+        ]);
 
       setChartData(chartResult);
+      setSummary(summaryResult);
       setVentas(ventasResult);
       setGastos(gastosResult);
     } catch (err) {
@@ -61,9 +79,16 @@ const Dashboard: React.FC = () => {
     return new Date(dateString).toLocaleDateString("es-AR");
   };
 
-  const totalVentas = ventas.reduce((sum, venta) => sum + venta.monto, 0);
-  const totalGastos = gastos.reduce((sum, gasto) => sum + gasto.monto, 0);
-  const balance = totalVentas - totalGastos;
+  // Use summary data for totals, fallback to calculation from displayed records
+  const totalVentas =
+    summary?.total_ventas ??
+    ventas.reduce((sum, venta) => sum + venta.monto, 0);
+  const totalGastos =
+    summary?.total_gastos ??
+    gastos.reduce((sum, gasto) => sum + gasto.monto, 0);
+  const balance = summary?.balance ?? totalVentas - totalGastos;
+  const countVentas = summary?.count_ventas ?? ventas.length;
+  const countGastos = summary?.count_gastos ?? gastos.length;
 
   if (loading) {
     return (
@@ -90,7 +115,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-    
       <div className="grid grid-3" style={{ marginBottom: "2rem" }}>
         <div className="card">
           <div className="card-body">
@@ -101,7 +125,7 @@ const Dashboard: React.FC = () => {
               {formatCurrency(totalVentas)}
             </p>
             <small style={{ color: "#64748b" }}>
-              Este mes ({ventas.length} registros)
+              Este mes ({countVentas} registros)
             </small>
           </div>
         </div>
@@ -115,7 +139,7 @@ const Dashboard: React.FC = () => {
               {formatCurrency(totalGastos)}
             </p>
             <small style={{ color: "#64748b" }}>
-              Este mes ({gastos.length} registros)
+              Este mes ({countGastos} registros)
             </small>
           </div>
         </div>
@@ -182,7 +206,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
- 
       <div className="grid grid-2">
         <div className="card">
           <div className="card-header">

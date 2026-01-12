@@ -27,6 +27,8 @@ class ApiService {
     if (filters?.start_date) params.append("start_date", filters.start_date);
     if (filters?.end_date) params.append("end_date", filters.end_date);
     if (filters?.categoria) params.append("categoria", filters.categoria);
+    if (filters?.dashboard) params.append("dashboard", "true");
+    if (filters?.limit) params.append("limit", filters.limit.toString());
 
     const url = `${FINANZAS_API_BASE}/ventas${
       params.toString() ? `?${params.toString()}` : ""
@@ -97,6 +99,8 @@ class ApiService {
     if (filters?.start_date) params.append("start_date", filters.start_date);
     if (filters?.end_date) params.append("end_date", filters.end_date);
     if (filters?.categoria) params.append("categoria", filters.categoria);
+    if (filters?.dashboard) params.append("dashboard", "true");
+    if (filters?.limit) params.append("limit", filters.limit.toString());
 
     const url = `${FINANZAS_API_BASE}/gastos${
       params.toString() ? `?${params.toString()}` : ""
@@ -174,6 +178,32 @@ class ApiService {
 
     if (!response.ok) {
       throw new Error("Error al obtener datos del dashboard");
+    }
+
+    return response.json();
+  }
+
+  async getDashboardSummary(
+    token: string,
+    period: string = "month"
+  ): Promise<{
+    total_ventas: number;
+    total_gastos: number;
+    balance: number;
+    count_ventas: number;
+    count_gastos: number;
+    period: string;
+  }> {
+    const response = await fetch(
+      `${FINANZAS_API_BASE}/dashboard/summary?period=${period}`,
+      {
+        method: "GET",
+        headers: this.getAuthHeaders(token),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Error al obtener resumen del dashboard");
     }
 
     return response.json();
