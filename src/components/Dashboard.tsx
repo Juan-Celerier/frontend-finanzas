@@ -41,26 +41,45 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       setError("");
 
-      const [chartResult, summaryResult, ventasResult, gastosResult] =
-        await Promise.all([
-          apiService.getDashboardData(token!),
-          apiService.getDashboardSummary(token!),
-          apiService.getVentas(token!, {
-            period: "month",
-            dashboard: true,
-            limit: 5,
-          }),
-          apiService.getGastos(token!, {
-            period: "month",
-            dashboard: true,
-            limit: 5,
-          }),
-        ]);
+      // Load chart data and lists first
+      const [chartResult, ventasResult, gastosResult] = await Promise.all([
+        apiService.getDashboardData(token!),
+        apiService.getVentas(token!, {
+          period: "month",
+          dashboard: true,
+          limit: 5,
+        }),
+        apiService.getGastos(token!, {
+          period: "month",
+          dashboard: true,
+          limit: 5,
+        }),
+      ]);
 
       setChartData(chartResult);
-      setSummary(summaryResult);
       setVentas(ventasResult);
       setGastos(gastosResult);
+
+      // Try to load summary, but handle if endpoint doesn't exist
+      try {
+        const summaryResult = await apiService.getDashboardSummary(token!);
+        setSummary(summaryResult);
+      } catch (summaryErr) {
+        // Check if it's the specific "endpoint not available" error
+        if (
+          summaryErr instanceof Error &&
+          summaryErr.message === "SUMMARY_ENDPOINT_NOT_AVAILABLE"
+        ) {
+          // Summary endpoint doesn't exist - this is expected for this implementation
+          console.log(
+            "Dashboard summary endpoint not implemented - using calculated data from lists"
+          );
+          setSummary(null); // Will use fallback calculation below
+        } else {
+          // Re-throw other errors
+          throw summaryErr;
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar datos");
     } finally {
