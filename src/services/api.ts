@@ -204,7 +204,7 @@ class ApiService {
     period: string;
   }> {
     const response = await fetch(
-      `${FINANZAS_API_BASE}/dashboard/summary?period=${period}`,
+      `${FINANZAS_API_BASE}/dashboard/line-chart?period=${period}`,
       {
         method: "GET",
         headers: this.getAuthHeaders(token),
