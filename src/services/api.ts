@@ -212,10 +212,6 @@ class ApiService {
     );
 
     if (!response.ok) {
-      // If endpoint doesn't exist (404), throw a specific error
-      if (response.status === 404) {
-        throw new Error("SUMMARY_ENDPOINT_NOT_AVAILABLE");
-      }
       throw new Error("Error al obtener resumen del dashboard");
     }
 
