@@ -177,10 +177,19 @@ class ApiService {
     );
 
     if (!response.ok) {
+      // If endpoint doesn't exist (404), return empty array
+      if (response.status === 404) {
+        return [];
+      }
       throw new Error("Error al obtener datos del dashboard");
     }
 
-    return response.json();
+    const result = await response.json();
+    if (!Array.isArray(result)) {
+      throw new Error("Error al obtener datos del dashboard");
+    }
+
+    return result;
   }
 
   async getDashboardSummary(
